@@ -44,3 +44,39 @@ compress([Current|Xs], Current, Ys) :-
     compress(Xs, Current, Ys).
 compress([X|Xs], Current, [X|Ys]) :- X \= Current, compress(Xs, X, Ys).
 
+% P09
+% The first variant does not use an accumulator and suffers performance-wise:
+% lists with >20 elements are very slow to pack. pack/2 uses an accumulator and
+% does not suffer as much.
+%
+% Example:
+% ?- pack([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+% X = [[a,a,a,a],[b],[c,c],[a,a],[d],[e,e,e,e]]
+pack([], []).
+pack([X], [[X]]) :- atom(X).
+pack([X|Xs], [[X,X|S]|Ys]) :- pack(Xs, [[X|S]|Ys]).
+pack([X|Xs], [[X],[O|S]|Ys]) :-
+    pack(Xs, [[O|S]|Ys]),
+    % It is imperative to check after the recursive call; Otherwise, the clause does
+    % not work. O must be instantiated for the equality check to work properly.
+    X \= O.
+
+% pack with an accumulator
+
+pack2([X|Xs], Ys) :- pack2(Xs, [[X]], Ys).
+
+pack2([], Acc, Ys) :- lists:reverse(Acc, Ys).
+pack2([X|Xs], [[X|Acc]|AccR], Ys) :-
+    pack2(Xs, [[X,X|Acc]|AccR], Ys).
+pack2([X|Xs], [[Y|Acc]|AccR], Ys) :-
+    X \= Y,
+    pack2(Xs, [[X], [Y|Acc]|AccR], Ys).
+
+% This can be used to generate lists from a set of elements at random:
+rmember(Els, El) :- lists:member(El, Els).
+% -> Els = [a,b,c], N = 3, lists:length(Xs, N), lists:maplist(rmember(Els), Xs).
+% With that, benchmarking pack/2 and pack2/2 is simple (the time module is needed):
+% ?- Els = [a,b,c], N = 20, lists:length(Xs, N),
+% lists:maplist(rmember(Els), Xs),
+% time(pack(Xs, Ys1)),
+% time(pack2(Xs, Ys2)).
