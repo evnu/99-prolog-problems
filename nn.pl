@@ -80,3 +80,32 @@ rmember(Els, El) :- lists:member(El, Els).
 % lists:maplist(rmember(Els), Xs),
 % time(pack(Xs, Ys1)),
 % time(pack2(Xs, Ys2)).
+
+% P10
+% ?- encode([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+% X = [[4,a],[1,b],[2,c],[2,a],[1,d][4,e]]
+encode(Xs, Ys) :-
+    pack2(Xs, Ys1),
+    encode1(Ys1, Ys).
+
+encode1([], []).
+encode1([Run|Rest], [[Length, Element]|Ys]) :-
+    lists:length(Run, Length),
+    [Element | _] = Run,
+    encode1(Rest, Ys).
+
+% P11
+% ?- encode_modified([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+% X = [[4,a],b,[2,c],[2,a],d,[4,e]]
+encode_modified(Xs, Ys) :-
+    pack2(Xs, Ys1),
+    encode_modified1(Ys1, Ys).
+
+encode_modified1([], []).
+encode_modified1([Run|Rest], [[Length, Element]|Ys]) :-
+    lists:length(Run, Length),
+    Length > 1,
+    [Element | _] = Run,
+    encode_modified1(Rest, Ys).
+encode_modified1([[Element]|Rest], [Element|Ys]) :-
+    encode_modified1(Rest, Ys).
