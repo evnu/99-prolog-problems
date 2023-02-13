@@ -109,3 +109,38 @@ encode_modified1([Run|Rest], [[Length, Element]|Ys]) :-
     encode_modified1(Rest, Ys).
 encode_modified1([[Element]|Rest], [Element|Ys]) :-
     encode_modified1(Rest, Ys).
+
+% P12
+decode_modified([], []).
+decode_modified([[N, X]|Xs], [X|Ys]) :-
+    N > 0,
+    N1 is N - 1,
+    decode_modified([[N1, X]|Xs], Ys).
+decode_modified([[0, _]|Xs], Ys) :- decode_modified(Xs, Ys).
+decode_modified([X|Xs], [X|Ys]) :- atom(X), decode_modified(Xs, Ys).
+
+% P13
+% ?- encode_direct([a,a,a,a,b,c,c,a,a,d,e,e,e,e],X).
+% X = [[4,a],b,[2,c],[2,a],d,[4,e]]
+
+encode_direct([X|Xs], Ys) :-
+    encode_direct(Xs, [[X,1]], Ys).
+encode_direct([], []).
+
+encode_direct([X|Xs], [[X,N]|Acc], Ys) :-
+    N1 is N + 1,
+    encode_direct(Xs, [[X,N1]|Acc], Ys).
+encode_direct([X|Xs], [[Y,N]|Acc], Ys) :-
+    X \= Y,
+    encode_direct(Xs, [[X,1],[Y,N]|Acc], Ys).
+encode_direct([], Acc, Ys) :-
+    encode_direct_reverse(Acc, [], Ys).
+
+encode_direct_reverse([[X,N]|Xs], Acc, Ys) :-
+    N > 1,
+    encode_direct_reverse(Xs, [[X,N]|Acc], Ys).
+
+encode_direct_reverse([[X,1]|Xs], Acc, Ys) :-
+    encode_direct_reverse(Xs, [X|Acc], Ys).
+
+encode_direct_reverse([], Acc, Acc).
