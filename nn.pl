@@ -144,3 +144,63 @@ encode_direct_reverse([[X,1]|Xs], Acc, Ys) :-
     encode_direct_reverse(Xs, [X|Acc], Ys).
 
 encode_direct_reverse([], Acc, Acc).
+
+% P14 Duplicate the elements of a list
+% ?- dupli([a,b,c,c,d],X).
+% X = [a,a,b,b,c,c,c,c,d,d]
+dupli([],[]).
+dupli([X|Xs], [X,X|Ys]) :- dupli(Xs, Ys).
+
+% P15 Duplicate the elements of a list a given number of times.
+% ?- dupli([a,b,c],3,X).
+% X = [a,a,a,b,b,b,c,c,c]
+
+dupli(Xs, N, Ys) :-
+    dupli(Xs, N, [], Ys).
+
+dupli([], _, Acc, Ys) :-
+    lists:reverse(Acc, Ys).
+dupli([X|Xs], N, Acc0, Ys) :-
+    $dupli1(X, N, Acc0, Acc1),
+    dupli(Xs, N, Acc1, Ys).
+
+dupli1(_, 0, Acc, Acc) :- !.
+dupli1(X, N, Acc0, FinalAcc) :-
+    % Not using clpz here, as I want N to be ground. For non-ground N, we'd need to
+    % remove the cut above (as a non-ground N always unifies with 0, but that is probably
+    % not the answer for our question), and we can run into an endless loop when asking for
+    % more than one answer.
+    N > 0,
+    N1 is N - 1,
+    dupli1(X, N1, [X|Acc0], FinalAcc).
+
+% P16 Drop every N'th element from a list.
+% ?- drop([a,b,c,d,e,f,g,h,i,k],3,X).
+% X = [a,b,d,e,g,h,k]
+drop(Xs, N, Ys) :-
+    drop(Xs, counter(1, N), [], Ys).
+
+drop([], _, Acc, Ys) :-
+    lists:reverse(Acc, Ys).
+
+drop([_|Xs], counter(N, N), Acc, Ys) :-
+    !,
+    drop(Xs, counter(1, N), Acc, Ys).
+drop([X|Xs], counter(C, N), Acc, Ys) :-
+    C \= N,
+    C1 is C + 1,
+    drop(Xs, counter(C1, N), [X|Acc], Ys).
+
+% P17 Split a list into two parts; the length of the first part is given.
+% ?- split([a,b,c,d,e,f,g,h,i,k],3,L1,L2).
+% L1 = [a,b,c]
+% L2 = [d,e,f,g,h,i,k]
+split(Xs, N, L1, L2) :-
+    split(Xs, N, [], L1, L2).
+
+split(L2, 0, Acc, L1, L2) :-
+    !,
+    lists:reverse(Acc, L1).
+split([X|Xs], N, Acc, L1, L2) :-
+    N1 #= N - 1,
+    split(Xs, N1, [X|Acc], L1, L2).
