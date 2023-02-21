@@ -204,3 +204,26 @@ split(L2, 0, Acc, L1, L2) :-
 split([X|Xs], N, Acc, L1, L2) :-
     N1 #= N - 1,
     split(Xs, N1, [X|Acc], L1, L2).
+
+% P18 Extract a slice from a list.
+% ?- slice([a,b,c,d,e,f,g,h,i,k],3,7,L).
+% X = [c,d,e,f,g]
+slice(Xs, I, K, L) :-
+    K1 #= K - I + 1,
+    drop_until(Xs, I, Suffix),
+    take_until(Suffix, K1, [], L).
+
+drop_until(Xs, 1, Xs) :-
+    !.
+drop_until([_|Xs], N, Ys) :-
+    N #> 1,
+    N1 #= N - 1,
+    drop_until(Xs, N1, Ys).
+
+take_until(_, 0, Acc, Ys) :-
+    !,
+    lists:reverse(Acc, Ys).
+take_until([X|Xs], N, Acc, Ys) :-
+    N #> 0,
+    N1 #= N - 1,
+    take_until(Xs, N1, [X|Acc], Ys).
