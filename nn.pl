@@ -261,3 +261,21 @@ rotate_neg([X|Xs], N, L, Ys) :-
     N #< 0,
     N1 #= N + 1,
     rotate_neg(Xs, N1, [X|L], Ys).
+
+% P20 (*) Remove the K'th element from a list.
+%     Example:
+%     ?- remove_at(X,[a,b,c,d],2,R).
+%     X = b
+%     R = [a,c,d]
+remove_at(X, Xs, N, R) :-
+    remove_at(X, Xs, N, [], R).
+
+remove_at(X, [Y|Ys], N, Acc, R) :-
+    N #> 1,
+    !,
+    N1 #= N - 1,
+    remove_at(X, Ys, N1, [Y|Acc], R).
+remove_at(X, [X|R], 1, Acc, Ys) :-
+    lists:reverse(Acc, Acc1),
+    lists:append(Acc1, R, Ys).
+
