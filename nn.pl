@@ -161,7 +161,7 @@ dupli(Xs, N, Ys) :-
 dupli([], _, Acc, Ys) :-
     lists:reverse(Acc, Ys).
 dupli([X|Xs], N, Acc0, Ys) :-
-    $dupli1(X, N, Acc0, Acc1),
+    dupli1(X, N, Acc0, Acc1),
     dupli(Xs, N, Acc1, Ys).
 
 dupli1(_, 0, Acc, Acc) :- !.
@@ -227,3 +227,37 @@ take_until([X|Xs], N, Acc, Ys) :-
     N #> 0,
     N1 #= N - 1,
     take_until(Xs, N1, [X|Acc], Ys).
+
+% P19 Rotate a list N places to the left.
+% Examples:
+% ?- rotate([a,b,c,d,e,f,g,h],3,X).
+% X = [d,e,f,g,h,a,b,c]
+%
+% ?- rotate([a,b,c,d,e,f,g,h],-2,X).
+% X = [g,h,a,b,c,d,e,f]
+
+rotate(Xs, N, Ys) :-
+    N #> 0,
+    rotate_pos(Xs, N, [], Ys).
+
+rotate(Xs, N, Ys) :-
+    N #< 0,
+    lists:reverse(Xs, Xs1),
+    rotate_neg(Xs1, N, [], Ys1),
+    lists:reverse(Ys1, Ys).
+
+rotate_pos(Xs, 0, L, Ys) :-
+    lists:reverse(L, L1),
+    lists:append(Xs, L1, Ys).
+rotate_pos([X|Xs], N, L, Ys) :-
+    N #> 0,
+    N1 #= N - 1,
+    rotate_pos(Xs, N1, [X|L], Ys).
+
+rotate_neg(Xs, 0, L, Ys) :-
+    lists:reverse(L, L1),
+    lists:append(Xs, L1, Ys).
+rotate_neg([X|Xs], N, L, Ys) :-
+    N #< 0,
+    N1 #= N + 1,
+    rotate_neg(Xs, N1, [X|L], Ys).
