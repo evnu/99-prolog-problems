@@ -279,3 +279,23 @@ remove_at(X, [X|R], 1, Acc, Ys) :-
     lists:reverse(Acc, Acc1),
     lists:append(Acc1, R, Ys).
 
+% P21 (*) Insert an element at a given position into a list.
+%     Example:
+%     ?- insert_at(alfa,[a,b,c,d],2,L).
+%     L = [a,alfa,b,c,d]
+insert_at(E, [X|Xs], N, [X|Ys]) :-
+    N #> 1,
+    !,
+    N1 #= N - 1,
+    insert_at(E, Xs, N1, Ys).
+insert_at(E, Xs, 1, [E|Xs]).
+
+% P22 (*) Create a list containing all integers within a given range.
+%     Example:
+%     ?- range(4,9,L).
+%     L = [4,5,6,7,8,9]
+range(From, To, [From|Ns]) :-
+    From #< To,
+    From1 #= From + 1,
+    range(From1, To, Ns).
+range(N, N, [N]).
