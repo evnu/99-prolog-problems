@@ -299,3 +299,41 @@ range(From, To, [From|Ns]) :-
     From1 #= From + 1,
     range(From1, To, Ns).
 range(N, N, [N]).
+
+
+% P23 (**) Extract a given number of randomly selected elements from a list.
+%     The selected items shall be put into a result list.
+%     Example:
+%     ?- rnd_select([a,b,c,d,e,f,g,h],3,L).
+%     L = [e,d,a]
+rnd_select(Xs, N, Ls) :-
+    lists:length(Xs, Length),
+    rnd_select(Xs, N, Length, Ls).
+
+rnd_select(Xs, N, Length, [X|Ls]) :-
+    N #> 0,
+    Length #> 0,
+    N1 #= N - 1,
+    Length1 #= Length - 1,
+    random:random_integer(1, Length, At),
+    remove_at(X, Xs, At, Xs1),
+    rnd_select(Xs1, N1, Length1, Ls).
+rnd_select(_, 0, _, []).
+rnd_select(Xs, 1, 1, Xs).
+
+% P24 (*) Lotto: Draw N different random numbers from the set 1..M.
+%     The selected numbers shall be put into a result list.
+%     Example:
+%     ?- lotto(6,49,L).
+%     L = [23,1,17,33,21,37]
+lotto(N, M, L) :-
+    range(1, M, Xs),
+    rnd_select(Xs, N, L).
+
+% P25 (*) Generate a random permutation of the elements of a list.
+%     Example:
+%     ?- rnd_permu([a,b,c,d,e,f],L).
+%     L = [b,a,d,c,e,f]
+rnd_permu(Xs, L) :-
+    lists:length(Xs, N),
+    rnd_select(Xs, N, L).
