@@ -272,8 +272,8 @@ remove_at(X, Xs, N, R) :-
 
 remove_at(X, [Y|Ys], N, Acc, R) :-
     N #> 1,
-    !,
     N1 #= N - 1,
+    !,
     remove_at(X, Ys, N1, [Y|Acc], R).
 remove_at(X, [X|R], 1, Acc, Ys) :-
     lists:reverse(Acc, Acc1),
@@ -337,3 +337,26 @@ lotto(N, M, L) :-
 rnd_permu(Xs, L) :-
     lists:length(Xs, N),
     rnd_select(Xs, N, L).
+
+% P26 (**) Generate the combinations of K distinct objects chosen from the N elements of a list
+%     In how many ways can a committee of 3 be chosen from a group of 12
+%     people? We all know that there are C(12,3) = 220 possibilities (C(N,K)
+%     denotes the well-known binomial coefficients). For pure mathematicians,
+%     this result may be great. But we want to really generate all the
+%     possibilities (via backtracking).
+%
+%    Example:
+%    ?- combination(3,[a,b,c,d,e,f],L).
+%    L = [a,b,c] ;
+%    L = [a,b,d] ;
+%    L = [a,b,e] ;
+%    ...
+combination(K, Xs, [X|Combinations]) :-
+    K #> 0,
+    pick_el(X, Xs, Xs1),
+    K1 #= K - 1,
+    combination(K1, Xs1, Combinations).
+combination(0, _, []).
+
+pick_el(X,[X|L],L).
+pick_el(X,[_|L],R) :- el(X,L,R).
